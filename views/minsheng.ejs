@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<style>
+    td {  text-align:center;
+        padding:10px }
+</style>
+<body>
+<table border="1" cellspacing="0" cellpadding="2">
+    <thead>
+    <tr>
+        <th>类型</th>
+        <th>周一</th>
+        <th>周二</th>
+        <th>周三</th>
+        <th>周四</th>
+        <th>周五</th>
+        <th>周六</th>
+        <th>周日</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for(let i = 0; i < types.length; i++) {%>
+    <tr>
+        <td><%=types[i].prop%></td>
+        <td><%=types[i].data[0]%></td>
+        <td><%=types[i].data[1]%></td>
+        <td><%=types[i].data[2]%></td>
+        <td><%=types[i].data[3]%></td>
+        <td><%=types[i].data[4]%></td>
+        <td><%=types[i].data[5]%></td>
+        <td><%=types[i].data[6]%></td>
+
+    </tr>
+    <% }%>
+    </tbody>
+</table>
+<br />
+<table border="1" cellspacing="0" cellpadding="2">
+    <thead>
+    <tr>
+        <th>产品名称</th>
+        <th>产品类别</th>
+        <th>封闭期</th>
+        <th>收益率</th>
+        <th>到期日</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for(let i = 0; i < products.length; i++) {
+        let incomerate = parseFloat(products[i].NEXT_INCOME_RATE)
+        if(isNaN(incomerate) || incomerate == 0) {
+            incomerate = '--';
+        }
+    %>
+    <tr>
+        <td><%=products[i].PRD_NAME%></td>
+        <td><%=products[i].PRD_TYPE%></td>
+        <td><%=products[i].LIVE_TIME%></td>
+        <td><%=incomerate%></td>
+        <td>周<%=products[i].EDDAY%></td>
+    </tr>
+    <% }%>
+    </tbody>
+</table>
+</body>
+</html>

@@ -19,16 +19,15 @@ function process(req, res, next) {
          // });
 }
 const xingyeMap = {
-    link: {index: 0, name: '链接'},
-    name: {index: 1, name: '产品名称'},
-    dueDate: {index: 2, name: '开始日期'},
-    dueDate: {index: 3, name: '截止日期'},
-    money: {index: 4, name: '币种'},
-    link: {index: 5, name: '期限'},
-    link: {index: 6, name: '起购金额'},
-    link: {index: 7, name: '收益率'},
-    link: {index: 8, name: '大额客户收益率'},
-
+    "LINK": {index: 0, name: '链接'},
+    "NAME": {index: 1, name: '产品名称'},
+    "OPDATE": {index: 2, name: '开始日期'},
+    "EDDATE": {index: 3, name: '截止日期'},
+    "MONEY": {index: 4, name: '币种'},
+    "LIVE_TIME": {index: 5, name: '期限'},
+    "START_AMT": {index: 6, name: '起购金额'},
+    "INCOME_RATE": {index: 7, name: '收益率'},
+    "VIP_INCOME_RATE": {index: 8, name: '大额客户收益率'},
 };
 module.exports = process;
 

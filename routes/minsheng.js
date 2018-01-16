@@ -1,10 +1,13 @@
 let cheerio = require('cheerio');
 let axios = require('axios');
+let moment = require('moment');
+let fs = require('fs');
+let ejs = require('ejs');
 let productType = {
     0: '每日型',
     1: '定期开放型',
     2: '封闭型',
-    3: '净值型'
+    4: '净值型'
 };
 const model = {
     "C1_FLAG": "0",
@@ -46,20 +49,88 @@ const model = {
     "SELLDIR": "销售对象"
 };
 
-function getEndDate(list) {
-    return list.map((product) => {
-        return {
-            "PRD_TYPE": productType[product["PRD_TYPE"]],
-            "EDDATE": product["EDDATE"],
-            "LIVE_TIME":product["LIVE_TIME"]
+function getEndDate(products) {
+    const initArray = [0, 0, 0, 0, 0, 0, 0];
+    let obj = {
+        "总计": {dayCount: initArray.slice()},
+        // "PRD_TYPE": {},
+        // "LIVE_TIME": {},
+    };
+
+    products.forEach(item => {
+        obj["总计"].dayCount[item["EDDAY"]] += 1;
+        if (!obj[item["PRD_TYPE"]]) {
+            obj[item["PRD_TYPE"]] = {dayCount: initArray.slice()}
         }
-    })
+        obj[item["PRD_TYPE"]].dayCount[item["EDDAY"] - 1] += 1;
+
+        if (!obj[item["LIVE_TIME"] + "天"]) {
+            obj[item["LIVE_TIME"] + "天"] = {dayCount: initArray.slice()}
+        }
+        obj[item["LIVE_TIME"] + "天"].dayCount[item["EDDAY"] - 1] += 1;
+
+        if (!obj[item["PRD_TYPE"] + item["LIVE_TIME"] + "天"]) {
+            obj[item["PRD_TYPE"] + item["LIVE_TIME"] + "天"] = {dayCount: initArray.slice()}
+        }
+        obj[item["PRD_TYPE"] + item["LIVE_TIME"] + "天"].dayCount[item["EDDAY"] - 1] += 1;
+
+    });
+    let types = [];
+    for(let prop in obj) {
+        types.push({prop:prop, data:obj[prop].dayCount});
+    }
+    types.sort((a, b) => { return a['prop'] > b['prop'] ? 1 : -1 });
+    return types;
 }
 
+function filterProducts(products, by) {
+    by = by || "PRD_TYPE";
+    const liveTime = "LIVE_TIME";
+    const rate = "NEXT_INCOME_RATE";
+    return products.filter((item) => item[by] !== '0')
+        .sort(function (a, b) {
+            const arate = parseFloat(a[rate]) || 99;
+            const brate = parseFloat(b[rate]) || 99;
+            if(a[by] === b[by] && a[liveTime] === b[liveTime]){
+                return arate -brate;
+            } else if( a[by] === b[by]) {
+                return a[liveTime] - b[liveTime]
+            }
+            return a[by] - b[by]
+        })
+        .map((product) => {
+            const weekDay = "";
+            if (!isNaN(moment(product["EDDATE"]).day())) {
+
+            }
+            return {
+                "PRD_TYPE": productType[product["PRD_TYPE"]],
+                "EDDATE": product["EDDATE"],
+                "EDDAY": moment(product["EDDATE"]).day() || "",
+                "LIVE_TIME": product["LIVE_TIME"],
+                "PRD_NAME": product["PRD_NAME"],
+                "NEXT_INCOME_RATE": product["NEXT_INCOME_RATE"]
+            }
+        });
+}
 
 function process(req, res, next) {
-    const lists = getEndDate(response.returnData.list);
-    console.log(lists);
+
+    // fs.readFile('./new.html', function (e, v) {
+    //         let ret = v.toString().replace(/<%-a%>/g, 'niefengjun.cn');
+    //
+    //         fs.writeFile('./minsheng.html', template, function (err) {
+    //             if (err) throw err;
+    //
+    //         });
+    //     }
+    // );
+    const products = filterProducts(response.returnData.list);
+    const types = getEndDate(products);
+    const  templateString = fs.readFileSync('views/minsheng.ejs', 'utf-8');
+    const minshengProducts = ejs.render(templateString, {products: products, types: types});
+    fs.writeFileSync('minshengProducts.html', minshengProducts, 'utf8');
+    res.render('minsheng', {products: products, types: types});
     // axios.post('http://www.cmbc.com.cn/channelApp/ajax/Financialpage', body, {
     //     headers: headers
     // })
@@ -4448,5 +4519,4 @@ const response = {
     "taskId": null,
     "texts": null,
     "uuid": ""
-}
-
+};

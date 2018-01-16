@@ -18,7 +18,7 @@ router.get('/xingye', function (req, res, next) {
 
 router.get('/minsheng', function (req, res, next) {
     const data = processMinsheng(req, res, next);
-    res.send(data);
+    // res.send(data);
 });
 
 module.exports = router;
