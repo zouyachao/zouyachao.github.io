@@ -127,10 +127,10 @@ function process(req, res, next) {
     // );
     const products = filterProducts(response.returnData.list);
     const types = getEndDate(products);
-    const  templateString = fs.readFileSync('views/minsheng.ejs', 'utf-8');
+    const  templateString = fs.readFileSync('views/templates/minsheng.ejs', 'utf-8');
     const minshengProducts = ejs.render(templateString, {products: products, types: types});
     fs.writeFileSync('minshengProducts.html', minshengProducts, 'utf8');
-    res.render('minsheng', {products: products, types: types});
+    res.render('templates/minsheng', {products: products, types: types});
     // axios.post('http://www.cmbc.com.cn/channelApp/ajax/Financialpage', body, {
     //     headers: headers
     // })

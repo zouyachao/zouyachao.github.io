@@ -1,23 +1,37 @@
 let cheerio = require('cheerio');
 let axios = require('axios');
-
+let moment = require('moment');
+let fs = require('fs');
+let ejs = require('ejs');
 function process(req, res, next) {
     // axios.get('http://wealth.cib.com.cn/retail/onsale/index.html')
     //      .then((response) => {
-             let $ = cheerio.load(content);//response.data
-             const titles = ['link'], $finTable = $('#finTable');
-             const rows = [];
-             $finTable.find('thead tr td').each((index, el) => {
-                 titles.push($(el).text().trim());
-                 console.log($(el).text().trim());
-             });
-             $finTable.find('tbody tr td').each((index, el) => {
-                 if (index === 0) rows.push($(el).find('a').attr('href'));
-                 rows.push($(el).text().trim());
-             });
-             res.send(titles.concat(rows));
-         // });
+    let $ = cheerio.load(content);//response.data
+    const titles = ['链接'], $finTable = $('#finTable');
+    const rows = [];
+    $finTable.find('thead tr td').each((index, el) => {
+        titles.push($(el).text().trim());
+        console.log($(el).text().trim());
+    });
+    titles.pop();
+    titles.push('周几');
+    $finTable.find('tbody tr').each((index, el) => {
+        const tr = $(el), row = [];
+        tr.find('td').each((index, el) => {
+            if (index === 0) row.push($(el).find('a').attr('href'));
+            row.push($(el).text().trim());
+        });
+        row.pop();
+        row.push('周' + moment(row[xingyeMap["EDDATE"].index],'YYYY/MM/DD').day());
+        rows.push(row)
+    });
+    const templateString = fs.readFileSync('views/templates/xingye.ejs', 'utf-8');
+    const xingyeProducts = ejs.render(templateString, {titles: titles, rows: rows});
+    fs.writeFileSync('xingyeProducts.html', xingyeProducts, 'utf8');
+    res.render('templates/xingye', {titles: titles, rows: rows});
+    // });
 }
+
 const xingyeMap = {
     "LINK": {index: 0, name: '链接'},
     "NAME": {index: 1, name: '产品名称'},
@@ -28,6 +42,7 @@ const xingyeMap = {
     "START_AMT": {index: 6, name: '起购金额'},
     "INCOME_RATE": {index: 7, name: '收益率'},
     "VIP_INCOME_RATE": {index: 8, name: '大额客户收益率'},
+    "EDDAYOFWEEK": {index: 9, name: '周几'}
 };
 module.exports = process;
 
