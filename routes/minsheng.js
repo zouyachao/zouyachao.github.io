@@ -111,6 +111,7 @@ function filterProducts(products, by) {
                 "EDDAY": moment(product["EDDATE"]).day() || "",
                 "LIVE_TIME": product["LIVE_TIME"],
                 "PRD_NAME": product["PRD_NAME"],
+                "PRD_CODE": product["PRD_CODE"],
                 "NEXT_INCOME_RATE": product["NEXT_INCOME_RATE"]
             }
         });
