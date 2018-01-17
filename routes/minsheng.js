@@ -58,7 +58,7 @@ function getEndDate(products) {
     };
 
     products.forEach(item => {
-        obj["总计"].dayCount[item["EDDAY"]] += 1;
+        obj["总计"].dayCount[item["EDDAY"] - 1] += 1;
         if (!obj[item["PRD_TYPE"]]) {
             obj[item["PRD_TYPE"]] = {dayCount: initArray.slice()}
         }
