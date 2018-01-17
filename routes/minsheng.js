@@ -76,10 +76,12 @@ function getEndDate(products) {
 
     });
     let types = [];
-    for(let prop in obj) {
-        types.push({prop:prop, data:obj[prop].dayCount});
+    for (let prop in obj) {
+        types.push({prop: prop, data: obj[prop].dayCount});
     }
-    types.sort((a, b) => { return a['prop'] > b['prop'] ? 1 : -1 });
+    types.sort((a, b) => {
+        return a['prop'] > b['prop'] ? 1 : -1
+    });
     return types;
 }
 
@@ -91,9 +93,9 @@ function filterProducts(products, by) {
         .sort(function (a, b) {
             const arate = parseFloat(a[rate]) || 99;
             const brate = parseFloat(b[rate]) || 99;
-            if(a[by] === b[by] && a[liveTime] === b[liveTime]){
-                return arate -brate;
-            } else if( a[by] === b[by]) {
+            if (a[by] === b[by] && a[liveTime] === b[liveTime]) {
+                return arate - brate;
+            } else if (a[by] === b[by]) {
                 return a[liveTime] - b[liveTime]
             }
             return a[by] - b[by]
@@ -127,7 +129,7 @@ function process(req, res, next) {
     // );
     const products = filterProducts(response.returnData.list);
     const types = getEndDate(products);
-    const  templateString = fs.readFileSync('views/templates/minsheng.ejs', 'utf-8');
+    const templateString = fs.readFileSync('views/templates/minsheng.ejs', 'utf-8');
     const minshengProducts = ejs.render(templateString, {products: products, types: types});
     fs.writeFileSync('minshengProducts.html', minshengProducts, 'utf8');
     res.render('templates/minsheng', {products: products, types: types});

@@ -26,12 +26,12 @@
     </thead>
     <tbody>
     <% for(let i = 0; i < rows.length; i++){ %>
-        <tr>
-            <td ><a href="<%=rows[i][0]%>"><%=rows[i][1]%></a></td>
+    <tr>
+        <td><a href="<%= rows[i][0] %>"><%= rows[i][1] %></a></td>
         <% for(let j = 2; j < rows[i].length; j++){ %>
-            <td><%= rows[i][j] %></td>
+        <td><%= rows[i][j] %></td>
         <% } %>
-        </tr>
+    </tr>
     <% } %>
 
     </tbody>

@@ -3,18 +3,21 @@ let axios = require('axios');
 let moment = require('moment');
 let fs = require('fs');
 let ejs = require('ejs');
+
 function process(req, res, next) {
     // axios.get('http://wealth.cib.com.cn/retail/onsale/index.html')
     //      .then((response) => {
     let $ = cheerio.load(content);//response.data
-    const titles = ['链接'], $finTable = $('#finTable');
+    let titles = ['链接'], $finTable = $('#finTable');
     const rows = [];
     $finTable.find('thead tr td').each((index, el) => {
         titles.push($(el).text().trim());
         console.log($(el).text().trim());
     });
     titles.pop();
-    titles.push('周几');
+    // titles.push('周几');
+    titles = ['链接', '产品名称', '募集起始日', '募集截止日', '币种', '期限（天）/投资周期', '起购金额(元)', '参考净收益率', '大额客户参考净收益率'];
+
     $finTable.find('tbody tr').each((index, el) => {
         const tr = $(el), row = [];
         tr.find('td').each((index, el) => {
@@ -22,8 +25,9 @@ function process(req, res, next) {
             row.push($(el).text().trim());
         });
         row.pop();
-        row.push('周' + moment(row[xingyeMap["EDDATE"].index],'YYYY/MM/DD').day());
-        rows.push(row)
+        row[3] += `(周${moment(row[xingyeMap["EDDATE"].index], 'YYYY/MM/DD').day()})`;
+        if (row[4] !== '美元')
+            rows.push(row)
     });
     const templateString = fs.readFileSync('views/templates/xingye.ejs', 'utf-8');
     const xingyeProducts = ejs.render(templateString, {titles: titles, rows: rows});
